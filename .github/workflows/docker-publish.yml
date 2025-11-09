@@ -1,0 +1,39 @@
+# Nome do workflow
+name: Publicar Imagem Docker no DockerHub
+
+# Define quando o workflow deve rodar
+on:
+  # Roda toda vez que um 'push' é feito no branch 'main'
+  push:
+    branches: [ "main" ]
+
+# Define os "trabalhos" (jobs) que o workflow executará
+jobs:
+  # O nome do job (pode ser qualquer nome)
+  build-and-push:
+    # O tipo de máquina que o job rodará
+    runs-on: ubuntu-latest
+
+    # Os passos (steps) que o job executará
+    steps:
+      # 1. Baixa o código do repositório
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      # 2. Faz o login no DockerHub
+      - name: Login no DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # 3. Constrói a imagem Docker e envia para o DockerHub
+      - name: Build e Push da imagem Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # IMPORTANTE: Altere a tag para o nome da sua imagem
+          # Use o formato: seu-username/nome-da-imagem:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/ex_docker_deploy:latest 
+          # Ex: ohara11/ex_docker_deploy:latest ou ohara11/apidocker:latest
